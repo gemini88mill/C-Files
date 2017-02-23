@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define BUFSIZE 1000
 
 struct linked_node{
 	char *name;
@@ -12,9 +15,9 @@ struct linked_node{
 //operation 1 - ticket booking
 struct linked_node* ticket_booking(struct linked_node* head, char *name);
 //operation 2 - cancel booking
-struct linked_node* cancel_booking();
+struct linked_node* cancel_booking(struct linked_node** list, char* name);
 //operation 3 - confirm booking
-int confirm_booking();
+int confirm_booking(struct linked_node* root, char* name);
 //operation 4 - display booking
 void display_booking(struct linked_node* current);
 //operation 5 - quit
@@ -22,14 +25,62 @@ void quit();
 
 
 
-int main(){
+int main(int argc, char **argv){
 
-	//read file
 	struct linked_node* root = malloc(sizeof(struct linked_node));
 	root->name = "head";
 	root->next = NULL;
 	
 	struct linked_node* current = root;
+
+	//read file
+	
+	FILE *fp = fopen(argv[1], "r");
+
+	char buff[BUFSIZE];
+	char *line;
+
+	while(fgets(buff, BUFSIZE - 1, fp) != NULL){
+		//reads in file one line at a time, must parse 
+		//format "[operation no] [name of customer]"
+		char *token;
+		char *delim = " ";
+
+		token = strtok(buff, delim);
+		int operation = atoi(token);
+		
+		token = strtok(NULL, delim);
+		char *name = token;
+
+		//printf("%s\t", name);
+		//printf("%d\n", operation);
+		
+		switch(operation){
+			case 1:
+				ticket_booking(current, name);
+				break;
+			case 2:
+				cancel_booking(&current, name);
+				break;
+			case 3:
+				confirm_booking(current, name);
+				break;
+			case 4:
+				display_booking(current);
+				break;
+			case 5:
+				quit();
+				break;
+			default:
+				printf("undocumented operation detected...");		
+		}
+				
+	
+	} 
+
+	
+
+	/*
 	
 	ticket_booking(current, "Joe Montana");
 	ticket_booking(current, "Billy Joel");
@@ -46,6 +97,8 @@ int main(){
 	confirm_booking(current, "Joe Montana");
 	
 	quit();
+
+	*/
 }
 
 /*	line will contain first name and last name of passenger (last name, first name)
